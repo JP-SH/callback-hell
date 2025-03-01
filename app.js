@@ -80,3 +80,14 @@ moveX(
 		alert('CANNOT MOVE FURTHER!');
 	}
 );
+
+// how to write the same code as above by using promises
+moveXPromise(btn, 100, 1000)
+  .then(() => moveXPromise(btn, 100, 1000))
+  .then(() => moveXPromise(btn, 200, 1000))
+  .then(() => moveXPromise(btn, 300, 1000))
+  .then(() => moveXPromise(btn, 50, 1000))
+  .then(() => moveXPromise(btn, 50, 1000))
+  .catch((position) => {
+    alert('CANNOT MOVE FURTHER!');
+  })
