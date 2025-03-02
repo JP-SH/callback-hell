@@ -48,11 +48,29 @@ const fakeRequest = (url) => {
 	return new Promise((resolve, reject) => {
 		setTimeout(() => {
 			const pages = {
-				'/users' : [
+				'/users'        : [
 					{ id: 1, username: 'Bilbo' },
 					{ id: 5, username: 'Esmerelda' }
 				],
-				'/about' : 'This is the about page!'
+				'/users/1'      : {
+					id        : 1,
+					username  : 'Bilbo',
+					upvotes   : 360,
+					city      : 'Lisbon',
+					topPostId : 454321
+				},
+				'/users/5'      : {
+					id       : 5,
+					username : 'Esmerelda',
+					upvotes  : 571,
+					city     : 'Honolulu'
+				},
+				'/posts/454321' : {
+					id    : 454321,
+					title :
+						'Ladies & Gentlemen, may I introduce my pet pig, Hamlet'
+				},
+				'/about'        : 'This is the about page!'
 			};
 			const data = pages[url];
 			if (data) {
@@ -86,3 +104,30 @@ fakeRequest('/dogs')
 		console.log(res.status);
 		console.log('REQUEST FAILED');
 	});
+
+// nexted promises. THis is how it looks with no catches. Adding catches will make this even more nexted and confusing
+  fakeRequest('/users').then((res) => {
+    const id = res.data[0].id;
+    fakeRequest(`/users/${id}`).then((res) => {
+      const postID = res.data.topPostId
+      fakeRequest(`/post/${postID}`).then((res) => {
+        console.log(res);
+      })
+    })
+  })
+
+  // writing the same code as above but refactoring it better. The reason this chaining works is because each callback returns a promise.Chaining it this way also means you only have to do one catch
+  fakeRequest('/users').then((res) => {
+    const id = res.data[0].id;
+    return fakeRequest(`/users/${id}`)
+    })
+    .then((res) => {
+    const postID = res.data.topPostId
+    return fakeRequest(`/post/${postID}`)
+    })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log('OH NO!', err);
+    })
